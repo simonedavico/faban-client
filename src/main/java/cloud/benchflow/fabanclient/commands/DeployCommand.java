@@ -36,10 +36,10 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
         return deploy(fabanConfig);
     }
 
-    //TODO: add clearconfig param to post request
     private DeployStatus deploy(FabanClientConfig fabanConfig) throws IOException {
 
         File jarFile = this.config.getJarFile();
+        Boolean clearConfig = config.clearConfig();
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()){
 
@@ -50,6 +50,7 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
             HttpEntity multipartEntity = MultipartEntityBuilder.create()
                                   .addTextBody("user", fabanConfig.getUser())
                                   .addTextBody("password", fabanConfig.getPassword())
+                                  .addTextBody("clearconfig", clearConfig.toString())
                                   .addBinaryBody("jarfile", jarFile)
                                   .build();
 
