@@ -3,3 +3,7 @@
 //Eclipse settings
 .settings
 .classpath
+//IntelliJ stuff
+FabanClient.iml
+.idea
+
