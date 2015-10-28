@@ -17,7 +17,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Created by simonedavico on 28/10/15.
+ * @author Simone D'Avico <simonedavico@gmail.com>
+ *
+ * Created on 28/10/15.
  */
 public class StatusCommand extends Configurable<StatusConfig> implements Command<RunStatus> {
 
@@ -51,7 +53,7 @@ public class StatusCommand extends Configurable<StatusConfig> implements Command
         } catch (URISyntaxException e) {
             throw new MalformedURIException("Attempted to check status from malformed URI: " + e.getInput(), e);
         }
-        
+
     }
 
 

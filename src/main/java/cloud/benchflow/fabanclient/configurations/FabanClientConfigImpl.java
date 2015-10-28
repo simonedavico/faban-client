@@ -3,7 +3,7 @@ package cloud.benchflow.fabanclient.configurations;
 import java.net.URI;
 
 /**
- * Created by simonedavico on 26/10/15.
+ * @author Simone D'Avico <simonedavico@gmail.com>
  *
  * A configuration class for the faban client.
  * The user can configure username and password,

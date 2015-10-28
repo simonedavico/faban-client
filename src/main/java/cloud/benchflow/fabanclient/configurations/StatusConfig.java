@@ -3,7 +3,9 @@ package cloud.benchflow.fabanclient.configurations;
 import cloud.benchflow.fabanclient.responses.RunId;
 
 /**
- * Created by simonedavico on 28/10/15.
+ * @author Simone D'Avico <simonedavico@gmail.com>
+ *
+ * Created on 28/10/15.
  */
 public class StatusConfig implements Config {
 

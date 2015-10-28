@@ -38,7 +38,7 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
 
     //TODO: add clearconfig param to post request
     private DeployStatus deploy(FabanClientConfig fabanConfig) throws IOException {
-        //Implement logic
+
         File jarFile = this.config.getJarFile();
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()){

@@ -3,7 +3,8 @@ package cloud.benchflow.fabanclient.responses;
 import cloud.benchflow.fabanclient.exceptions.IllegalRunIdException;
 
 /**
- * Created by simonedavico on 28/10/15.
+ *
+ * @author Simone D'Avico <simonedavico@gmail.com>
  */
 public class RunId implements Response {
 
