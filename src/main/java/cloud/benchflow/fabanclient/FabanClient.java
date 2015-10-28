@@ -26,6 +26,9 @@ import java.util.jar.JarFile;
  * The faban client implementation.
  */
 //TODO: check if the notnull annotation is usable outside of intellij
+//TODO: implement pending
+//TODO: implement showlogs
+//TODO: implement kill
 public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     private FabanClientConfig fabanConfig = new FabanClientDefaultConfig();
@@ -35,8 +38,6 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @return a response enclosing the status of the operation
      */
     public DeployStatus deploy(@NotNull File jarFile) throws FabanClientException {
-
-
 
         if(jarFile.exists()) {
 
@@ -123,4 +124,11 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     }
 
+    public <R extends RunId, T> T submit(String benchmarkName, String profile, File configFile, Function<R, T> handler) throws FabanClientException {
+        return this.submit(benchmarkName, profile, configFile).handle(handler);
+    }
+
+    public <R extends RunId> void submit(String benchmarkName, String profile, File configFile, Consumer<R> handler) throws FabanClientException {
+        this.submit(benchmarkName, profile, configFile).handle(handler);
+    }
 }
