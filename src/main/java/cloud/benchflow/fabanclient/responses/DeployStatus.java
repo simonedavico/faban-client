@@ -1,5 +1,6 @@
 package cloud.benchflow.fabanclient.responses;
 
+import cloud.benchflow.fabanclient.exceptions.DeployException;
 import org.apache.http.HttpStatus;
 
 
@@ -9,13 +10,9 @@ import org.apache.http.HttpStatus;
 //TODO: make all responses Jackson compliant for easy JSON serialization
 public class DeployStatus implements Response {
 
-    public enum Code { CONFLICT, NOT_ACCEPTABLE, CREATED, UNDEFINED };
+    public enum Code { CONFLICT, NOT_ACCEPTABLE, CREATED };
 
     private Code code;
-
-    public DeployStatus() {
-        this.code = Code.UNDEFINED;
-    }
 
     public DeployStatus(int statusCode) {
         switch(statusCode) {
@@ -29,7 +26,8 @@ public class DeployStatus implements Response {
                 this.code = Code.NOT_ACCEPTABLE;
                 break;
             default:
-                this.code = Code.UNDEFINED;
+                throw new DeployException("Deploy returned response with unexpected " +
+                                          "status code " + statusCode);
         }
     }
 

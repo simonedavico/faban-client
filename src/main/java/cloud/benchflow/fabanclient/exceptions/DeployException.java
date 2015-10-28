@@ -7,6 +7,10 @@ package cloud.benchflow.fabanclient.exceptions;
  */
 public class DeployException extends FabanClientException {
 
+    public DeployException(String message) {
+        super(message);
+    }
+
     public DeployException(String message, Throwable cause) {
         super(message, cause);
     }

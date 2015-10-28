@@ -3,6 +3,7 @@ package cloud.benchflow.fabanclient.commands;
 import cloud.benchflow.fabanclient.configurations.Configurable;
 import cloud.benchflow.fabanclient.configurations.DeployConfig;
 import cloud.benchflow.fabanclient.configurations.FabanClientConfig;
+import cloud.benchflow.fabanclient.exceptions.MalformedURIException;
 import cloud.benchflow.fabanclient.responses.DeployStatus;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -40,8 +41,6 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
         //Implement logic
         File jarFile = this.config.getJarFile();
 
-        DeployStatus dresp = new DeployStatus();
-
         try (CloseableHttpClient httpclient = HttpClients.createDefault()){
 
             URI deployURL = new URIBuilder(fabanConfig.getMasterURL())
@@ -56,15 +55,14 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
 
             post.setEntity(multipartEntity);
             post.setHeader("Accept", "text/plain");
-            dresp = httpclient.execute(post, (resp) -> new DeployStatus(resp.getStatusLine().getStatusCode()));
+            DeployStatus dresp = httpclient.execute(post, (resp) -> new DeployStatus(resp.getStatusLine().getStatusCode()));
 
             return dresp;
 
         } catch (URISyntaxException e) { //this should never occur
-            e.printStackTrace();
+            throw new MalformedURIException("Attempted to deploy to malformed URI: " + e.getInput(), e);
         }
 
-        return dresp;
     }
 
 }
