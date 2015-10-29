@@ -3,15 +3,22 @@ package cloud.benchflow.fabanclient.commands;
 import cloud.benchflow.fabanclient.configurations.Configurable;
 import cloud.benchflow.fabanclient.configurations.FabanClientConfig;
 import cloud.benchflow.fabanclient.configurations.SubmitConfig;
+import cloud.benchflow.fabanclient.exceptions.BenchmarkNameNotFoundException;
+import cloud.benchflow.fabanclient.exceptions.EmptyHarnessResponseException;
 import cloud.benchflow.fabanclient.exceptions.MalformedURIException;
 import cloud.benchflow.fabanclient.responses.RunId;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.client.ResponseHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,15 +34,18 @@ public class SubmitCommand extends Configurable<SubmitConfig> implements Command
 
     private static String SUBMIT_URL = "";
 
-    public RunId exec(FabanClientConfig fabanConfig) throws IOException {
+    public RunId exec(FabanClientConfig fabanConfig) throws IOException, BenchmarkNameNotFoundException {
         return submit(fabanConfig);
     }
 
-    public RunId submit(FabanClientConfig fabanConfig) throws IOException {
+    public RunId submit(FabanClientConfig fabanConfig) throws IOException, BenchmarkNameNotFoundException {
+
 
         String benchmarkName = config.getBenchmarkName();
         String profile = config.getProfile();
         File configFile = config.getConfigFile();
+
+        ResponseHandler<RunId> sh = resp -> new RunId(new BasicResponseHandler().handleEntity(resp.getEntity()));
 
         try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
@@ -52,10 +62,15 @@ public class SubmitCommand extends Configurable<SubmitConfig> implements Command
 
             post.setEntity(multipartEntity);
 
+            CloseableHttpResponse resp = httpClient.execute(post);
+            int statusCode = resp.getStatusLine().getStatusCode();
+            if(statusCode == HttpStatus.SC_NOT_FOUND)
+                throw new BenchmarkNameNotFoundException("Benchmark " + benchmarkName + " not deployed.");
+            if(statusCode == HttpStatus.SC_NO_CONTENT)
+                throw new EmptyHarnessResponseException();
+
             //TODO: check that this does indeed work
-            //TODO: check for SC_NOT_FOUND and SC_NO_CONTENT
-            RunId runId = httpClient.execute(post,
-                    resp -> new RunId(new BasicResponseHandler().handleEntity(resp.getEntity())));
+            RunId runId = sh.handleResponse(resp);
 
             return runId;
 

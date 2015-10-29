@@ -6,6 +6,8 @@ import cloud.benchflow.fabanclient.configurations.FabanClientConfig;
 import cloud.benchflow.fabanclient.exceptions.MalformedURIException;
 import cloud.benchflow.fabanclient.responses.DeployStatus;
 import org.apache.http.HttpEntity;
+
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -18,9 +20,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
-
 /**
- * Created by simonedavico on 26/10/15.
+ * @author Simone D'Avico <simonedavico@gmail.com>
+ *
+ * Created on 26/10/15.
  */
 public class DeployCommand extends Configurable<DeployConfig> implements Command<DeployStatus>  {
 
@@ -37,6 +40,8 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
     }
 
     private DeployStatus deploy(FabanClientConfig fabanConfig) throws IOException {
+
+        ResponseHandler<DeployStatus> dh = resp -> new DeployStatus(resp.getStatusLine().getStatusCode());
 
         File jarFile = this.config.getJarFile();
         Boolean clearConfig = config.clearConfig();
@@ -56,7 +61,8 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
 
             post.setEntity(multipartEntity);
             post.setHeader("Accept", "text/plain");
-            DeployStatus dresp = httpclient.execute(post, (resp) -> new DeployStatus(resp.getStatusLine().getStatusCode()));
+
+            DeployStatus dresp = httpclient.execute(post, dh);
 
             return dresp;
 

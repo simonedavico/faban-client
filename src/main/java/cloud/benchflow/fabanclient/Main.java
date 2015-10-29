@@ -1,5 +1,6 @@
 package cloud.benchflow.fabanclient;
 
+import cloud.benchflow.fabanclient.exceptions.JarFileNotFoundException;
 import cloud.benchflow.fabanclient.responses.DeployStatus;
 
 import java.io.File;
@@ -19,7 +20,12 @@ public class Main {
         //assume we want to deploy...
 
             //we can simply deploy and get the response
-        DeployStatus resp = client.deploy(new File(""));
+        DeployStatus resp = null;
+        try {
+            resp = client.deploy(new File(""));
+        } catch (JarFileNotFoundException e) {
+            e.printStackTrace();
+        }
         DeployStatus.Code code = resp.getCode();
 
         //handle it like this
@@ -43,13 +49,21 @@ public class Main {
         });
 
         //We can also directly pass a callback to the deploy call
-        client.deploy(new File(""), (DeployStatus x) -> System.out.println(x.getCode()));
+        try {
+            client.deploy(new File(""), (DeployStatus x) -> System.out.println(x.getCode()));
+        } catch (JarFileNotFoundException e) {
+            e.printStackTrace();
+        }
 
         //pass a callback and get a return value
-        ciao = client.deploy(new File(""), (DeployStatus x) -> {
-            System.out.println(x.getCode());
-            return true;
-        });
+        try {
+            ciao = client.deploy(new File(""), (DeployStatus x) -> {
+                System.out.println(x.getCode());
+                return true;
+            });
+        } catch (JarFileNotFoundException e) {
+            e.printStackTrace();
+        }
 
 
     }

@@ -5,6 +5,8 @@ package cloud.benchflow.fabanclient.exceptions;
  */
 public class FabanClientException extends RuntimeException {
 
+    public FabanClientException() {};
+
     public FabanClientException(String message) {
         super(message);
     }

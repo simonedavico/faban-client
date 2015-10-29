@@ -9,7 +9,7 @@ public class RunStatus implements Response {
 
     private Code status;
 
-    public enum Code { QUEUED, RECEIVED, STARTED, COMPLETED, FAILED, KILLED };
+    public enum Code { QUEUED, RECEIVED, STARTED, COMPLETED, FAILED, KILLED, KILLING, DENIED };
 
     public RunStatus(String statusCode, RunId runId) {
         switch (statusCode) {
@@ -25,6 +25,10 @@ public class RunStatus implements Response {
                 this.status = Code.FAILED;
             case "KILLED":
                 this.status = Code.KILLED;
+            case "KILLING":
+                this.status = Code.KILLING;
+            case "DENIED":
+                this.status = Code.DENIED;
             default:
                 throw new IllegalRunStatusException("RunId " + runId +
                                                     "returned illegal run status " +
