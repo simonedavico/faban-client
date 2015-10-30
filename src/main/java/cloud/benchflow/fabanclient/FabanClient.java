@@ -1,13 +1,11 @@
 package cloud.benchflow.fabanclient;
 
-import cloud.benchflow.fabanclient.commands.DeployCommand;
-import cloud.benchflow.fabanclient.commands.KillCommand;
-import cloud.benchflow.fabanclient.commands.StatusCommand;
-import cloud.benchflow.fabanclient.commands.SubmitCommand;
+import cloud.benchflow.fabanclient.commands.*;
 import cloud.benchflow.fabanclient.configurations.*;
 import cloud.benchflow.fabanclient.exceptions.*;
 import cloud.benchflow.fabanclient.responses.DeployStatus;
 import cloud.benchflow.fabanclient.responses.RunId;
+import cloud.benchflow.fabanclient.responses.RunQueue;
 import cloud.benchflow.fabanclient.responses.RunStatus;
 import com.sun.istack.internal.NotNull;
 
@@ -24,10 +22,7 @@ import java.util.jar.JarFile;
  * The faban client implementation.
  */
 //TODO: check if the notnull annotation is usable outside of intellij
-//TODO: implement pending
 //TODO: implement showlogs
-//TODO: implement kill
-//TODO: "resource/argument not found exceptions should be checked?"
 public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     private FabanClientConfig fabanConfig = new FabanClientDefaultConfig();
@@ -80,6 +75,12 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
         this.deploy(jarFile).handle(handler);
     }
 
+    /**
+     *
+     * @param runId a run id
+     * @return the status of the run
+     * @throws RunIdNotFoundException
+     */
     public RunStatus status(RunId runId) throws FabanClientException, RunIdNotFoundException {
 
         StatusConfig config = new StatusConfig(runId);
@@ -93,14 +94,40 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     }
 
+    /**
+     *
+     * @param runId a run id
+     * @param handler a callback function
+     * @param <R> The input to the {@param handler} function, a run status
+     * @param <T> The return type of the {@param handler} function
+     * @return An instance of {@link T}
+     * @throws FabanClientException
+     * @throws RunIdNotFoundException if passed a non existent run id
+     */
     public <R extends RunStatus, T> T status(RunId runId, Function<R, T> handler) throws FabanClientException, RunIdNotFoundException {
         return this.status(runId).handle(handler);
     }
 
+    /**
+     *
+     * @param runId a run id
+     * @param handler a callback function
+     * @param <R> The input to the {@param handler} consumer, a run status
+     * @throws RunIdNotFoundException
+     */
     public <R extends RunStatus> void status(RunId runId, Consumer<R> handler) throws FabanClientException, RunIdNotFoundException {
         this.status(runId).handle(handler);
     }
 
+    /**
+     *
+     * @param benchmarkName benchmark shortname
+     * @param profile a profile name
+     * @param configFile a config xml file for the run
+     * @return the run id for the run
+     * @throws ConfigFileNotFoundException
+     * @throws BenchmarkNameNotFoundException
+     */
     public RunId submit(String benchmarkName, String profile, File configFile) throws FabanClientException, ConfigFileNotFoundException, BenchmarkNameNotFoundException {
 
         if(configFile.exists()) {
@@ -123,14 +150,42 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     }
 
+    /**
+     *
+     * @param benchmarkName benchmark shortname
+     * @param profile a profile name
+     * @param configFile a config xml file for the run
+     * @param handler a callback function {@link R} -> {@link T}
+     * @param <R> a subclass of {@link RunId}
+     * @param <T> return type of the {@param handler} function
+     * @return the run id for the run
+     * @throws ConfigFileNotFoundException
+     * @throws BenchmarkNameNotFoundException
+     */
     public <R extends RunId, T> T submit(String benchmarkName, String profile, File configFile, Function<R, T> handler) throws FabanClientException, ConfigFileNotFoundException, BenchmarkNameNotFoundException {
         return this.submit(benchmarkName, profile, configFile).handle(handler);
     }
 
+    /**
+     *
+     * @param benchmarkName benchmark shortname
+     * @param profile a profile name
+     * @param configFile a config xml file
+     * @param handler a callback consumer {@link R} -> void
+     * @param <R> a subclass of {@link RunId}
+     * @throws ConfigFileNotFoundException
+     * @throws BenchmarkNameNotFoundException
+     */
     public <R extends RunId> void submit(String benchmarkName, String profile, File configFile, Consumer<R> handler) throws FabanClientException, ConfigFileNotFoundException, BenchmarkNameNotFoundException {
         this.submit(benchmarkName, profile, configFile).handle(handler);
     }
 
+    /**
+     *
+     * @param runId a run id
+     * @return status of the kill operation
+     * @throws RunIdNotFoundException
+     */
     public RunStatus kill(RunId runId) throws FabanClientException, RunIdNotFoundException {
 
         StatusConfig config = new StatusConfig(runId);
@@ -143,13 +198,65 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
         }
 
     }
-    
+
+    /**
+     *
+     * @param runId a run id
+     * @param handler a callback function {@link R} -> {@link T}
+     * @param <R> a subclass of {@link RunStatus}
+     * @param <T> return type of {@param handler}
+     * @return an object of type {@link T}
+     * @throws RunIdNotFoundException
+     */
     public <R extends RunStatus, T> T kill(RunId runId, Function<R,T> handler) throws RunIdNotFoundException, FabanClientException {
         return this.kill(runId).handle(handler);
     }
 
+    /**
+     *
+     * @param runId a run id
+     * @param handler a callback consumer {@link R} -> void
+     * @param <R> a subclass of {@link RunStatus}
+     * @throws RunIdNotFoundException
+     */
     public <R extends RunStatus> void kill(RunId runId, Consumer<R> handler) throws RunIdNotFoundException, FabanClientException {
         this.kill(runId).handle(handler);
+    }
+
+    /**
+     *
+     * @return a queue of pending run ids
+     */
+    public RunQueue pending() throws FabanClientException {
+
+        PendingCommand pending = new PendingCommand();
+
+        try {
+            return pending.exec(fabanConfig);
+        } catch (IOException e) {
+            throw new FabanClientException("Unexpected IO error while requesting for pending runs", e);
+        }
+
+    }
+
+    /**
+     *
+     * @param handler a callback function {@link R} -> {@link T}
+     * @param <R> a subclass of {@link RunStatus}
+     * @param <T> return type of {@param handler}
+     * @return a queue of pending run ids
+     */
+    public <R extends RunQueue, T> T pending(Function<R,T> handler) {
+        return this.pending().handle(handler);
+    }
+
+    /**
+     *
+     * @param handler a callback consumer {@link R} -> void
+     * @param <R> a subclass of {@link RunQueue}
+     */
+    public <R extends RunQueue> void pending(Consumer<R> handler) {
+        this.pending().handle(handler);
     }
 
 
