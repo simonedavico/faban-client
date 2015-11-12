@@ -1,5 +1,6 @@
-package cloud.benchflow.faban.client;
+package cloud.benchflow.faban.test.client;
 
+import cloud.benchflow.faban.client.FabanClient;
 import cloud.benchflow.faban.client.exceptions.JarFileNotFoundException;
 import cloud.benchflow.faban.client.responses.DeployStatus;
 
