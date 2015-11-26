@@ -4,7 +4,6 @@ import cloud.benchflow.faban.client.commands.*;
 import cloud.benchflow.faban.client.configurations.*;
 import cloud.benchflow.faban.client.exceptions.*;
 import cloud.benchflow.faban.client.responses.*;
-import com.sun.istack.internal.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param jarFile the benchmark to be deployed on the faban harness
      * @return a response enclosing the status of the operation
      */
-    public DeployStatus deploy(@NotNull File jarFile) throws FabanClientException, JarFileNotFoundException {
+    public DeployStatus deploy(File jarFile) throws FabanClientException, JarFileNotFoundException {
 
         if(jarFile.exists()) {
 
@@ -55,7 +54,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param <T> the arbitrary return type
      * @return an object of type {@code <T>}
      */
-    public <R extends DeployStatus, T> T deploy(@NotNull File jarFile, @NotNull Function<R, T> handler) throws FabanClientException, JarFileNotFoundException {
+    public <R extends DeployStatus, T> T deploy(File jarFile, Function<R, T> handler) throws FabanClientException, JarFileNotFoundException {
         return this.deploy(jarFile).handle(handler);
     }
 
@@ -66,7 +65,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param <R> the type of the handler input (has to extend {@link DeployStatus})
      * @throws FabanClientException
      */
-    public <R extends DeployStatus> void deploy(@NotNull File jarFile, @NotNull Consumer<R> handler) throws FabanClientException, JarFileNotFoundException {
+    public <R extends DeployStatus> void deploy(File jarFile, Consumer<R> handler) throws FabanClientException, JarFileNotFoundException {
         this.deploy(jarFile).handle(handler);
     }
 
