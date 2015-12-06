@@ -21,7 +21,7 @@ public class Main {
 
         //get an instance of faban client
         FabanClient client = new FabanClient();
-        Path bm = Paths.get("/Users/simonedavico/Desktop/foofoofoo.jar");
+        Path bm = Paths.get("./src/test/resources/foofoofoo.jar");
         try {
             client.deploy(bm.toFile()).handle((DeployStatus s) -> System.out.println(s.getCode()));
         } catch (JarFileNotFoundException e) {

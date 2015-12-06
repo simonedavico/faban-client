@@ -14,7 +14,6 @@ import java.util.function.Function;
  *
  * The faban client implementation.
  */
-//TODO: check if the notnull annotation is usable outside of intellij
 @SuppressWarnings("unused")
 public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
