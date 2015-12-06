@@ -5,7 +5,7 @@ package cloud.benchflow.faban.client.exceptions;
  *         <p/>
  *         Created on 29/10/15.
  */
-public class BenchmarkNameNotFoundException extends Exception {
+public class BenchmarkNameNotFoundException extends FabanClientException{
     public BenchmarkNameNotFoundException(String message) {
         super(message);
     }

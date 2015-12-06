@@ -14,8 +14,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -43,7 +43,7 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
 
         ResponseHandler<DeployStatus> dh = resp -> new DeployStatus(resp.getStatusLine().getStatusCode());
 
-        File jarFile = this.config.getJarFile();
+        InputStream jarFile = this.config.getJarFile();
         Boolean clearConfig = config.clearConfig();
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()){

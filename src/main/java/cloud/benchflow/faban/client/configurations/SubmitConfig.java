@@ -1,6 +1,6 @@
 package cloud.benchflow.faban.client.configurations;
 
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * @author Simone D'Avico <simonedavico@gmail.com>
@@ -11,9 +11,9 @@ public class SubmitConfig implements Config {
 
     private String benchmarkName;
     private String profile;
-    private File configFile;
+    private InputStream configFile;
 
-    public SubmitConfig(String benchmarkName, String profile, File configFile) {
+    public SubmitConfig(String benchmarkName, String profile, InputStream configFile) {
         this.benchmarkName = benchmarkName;
         this.profile = profile;
         this.configFile = configFile;
@@ -27,7 +27,7 @@ public class SubmitConfig implements Config {
         return profile;
     }
 
-    public File getConfigFile() {
+    public InputStream getConfigFile() {
         return configFile;
     }
 }

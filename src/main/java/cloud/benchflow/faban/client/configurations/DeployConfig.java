@@ -1,6 +1,6 @@
 package cloud.benchflow.faban.client.configurations;
 
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * Created by simonedavico on 26/10/15.
@@ -9,19 +9,20 @@ import java.io.File;
  */
 public class DeployConfig implements Config {
 
-    private File jarFile;
+    //private File jarFile;
+    private InputStream jarFile;
     private boolean clearConfig;
 
-    public DeployConfig(File jarFile) {
+    public DeployConfig(InputStream jarFile) {
         this(jarFile, true);
     }
 
-    public DeployConfig(File jarFile, boolean clearConfig) {
+    public DeployConfig(InputStream jarFile, boolean clearConfig) {
         this.jarFile = jarFile;
         this.clearConfig = clearConfig;
     }
 
-    public File getJarFile() {
+    public InputStream getJarFile() {
         return jarFile;
     }
 
