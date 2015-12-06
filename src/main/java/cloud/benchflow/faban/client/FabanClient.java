@@ -4,10 +4,8 @@ import cloud.benchflow.faban.client.commands.*;
 import cloud.benchflow.faban.client.configurations.*;
 import cloud.benchflow.faban.client.exceptions.*;
 import cloud.benchflow.faban.client.responses.*;
-import com.sun.istack.internal.NotNull;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -16,36 +14,52 @@ import java.util.function.Function;
  *
  * The faban client implementation.
  */
-//TODO: check if the notnull annotation is usable outside of intellij
 @SuppressWarnings("unused")
 public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     private FabanClientConfig fabanConfig = new FabanClientDefaultConfig();
 
+    public DeployStatus deploy(InputStream jarFile) throws FabanClientException {
+
+        DeployConfig config = new DeployConfig(jarFile);
+        DeployCommand deploy = new DeployCommand().withConfig(config);
+
+        try {
+            return deploy.exec(fabanConfig);
+        } catch (IOException e) {
+            throw new FabanClientException("An unknow error occurred while processing the driver to deploy. " +
+                                           "Please try again.", e);
+        }
+
+    }
+
     /**
      * @param jarFile the benchmark to be deployed on the faban harness
      * @return a response enclosing the status of the operation
      */
-    public DeployStatus deploy(@NotNull File jarFile) throws FabanClientException, JarFileNotFoundException {
+    public DeployStatus deploy(File jarFile) throws FabanClientException, JarFileNotFoundException {
 
-        if(jarFile.exists()) {
+        try(FileInputStream fin = new FileInputStream(jarFile)) {
 
-            DeployConfig config = new DeployConfig(jarFile);
-            DeployCommand deploy = new DeployCommand().withConfig(config);
+            return deploy(fin);
 
-            try {
-                return deploy.exec(fabanConfig);
-            } catch(IOException e) {
-                throw new DeployException("Something went wrong while deploying "
-                                          + jarFile.getName(), e);
-            }
-
-        } else {
+        } catch (FileNotFoundException e) {
             throw new JarFileNotFoundException("The specified jar file ( " +
                                             jarFile.getAbsolutePath() +
                                             " could not be found.");
+        } catch (IOException e) {
+            throw new FabanClientException("An unknow error occurred while processing the driver to deploy. " +
+                    "Please try again.", e);
         }
 
+    }
+
+    public <R extends DeployStatus, T> T deploy(InputStream jarFile, Function<R, T> handler) throws FabanClientException {
+        return this.deploy(jarFile).handle(handler);
+    }
+
+    public <R extends DeployStatus> void deploy(InputStream jarFile, Consumer<R> handler) throws FabanClientException {
+        this.deploy(jarFile).handle(handler);
     }
 
     /**
@@ -55,7 +69,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param <T> the arbitrary return type
      * @return an object of type {@code <T>}
      */
-    public <R extends DeployStatus, T> T deploy(@NotNull File jarFile, @NotNull Function<R, T> handler) throws FabanClientException, JarFileNotFoundException {
+    public <R extends DeployStatus, T> T deploy(File jarFile, Function<R, T> handler) throws FabanClientException, JarFileNotFoundException {
         return this.deploy(jarFile).handle(handler);
     }
 
@@ -66,7 +80,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param <R> the type of the handler input (has to extend {@link DeployStatus})
      * @throws FabanClientException
      */
-    public <R extends DeployStatus> void deploy(@NotNull File jarFile, @NotNull Consumer<R> handler) throws FabanClientException, JarFileNotFoundException {
+    public <R extends DeployStatus> void deploy(File jarFile, Consumer<R> handler) throws FabanClientException, JarFileNotFoundException {
         this.deploy(jarFile).handle(handler);
     }
 
@@ -114,6 +128,20 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
         this.status(runId).handle(handler);
     }
 
+    public RunId submit(String benchmarkName, String profile, InputStream configFile) throws FabanClientException, BenchmarkNameNotFoundException {
+
+        SubmitConfig config = new SubmitConfig(benchmarkName, profile, configFile);
+        SubmitCommand submit = new SubmitCommand().withConfig(config);
+
+        try {
+            return submit.exec(fabanConfig);
+        } catch (IOException e) {
+            throw new FabanClientException("Something went wrong while submitting the run for benchmark " +
+                                            benchmarkName + " at profile " + profile);
+        }
+
+    }
+
     /**
      *
      * @param benchmarkName benchmark shortname
@@ -125,24 +153,28 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      */
     public RunId submit(String benchmarkName, String profile, File configFile) throws FabanClientException, ConfigFileNotFoundException, BenchmarkNameNotFoundException {
 
-        if(configFile.exists()) {
-            SubmitConfig config = new SubmitConfig(benchmarkName, profile, configFile);
-            SubmitCommand submit = new SubmitCommand().withConfig(config);
+        //if(configFile.exists()) {
+        try(FileInputStream fin = new FileInputStream(configFile)) {
 
-            try {
-                return submit.exec(fabanConfig);
-            } catch (IOException e) {
-                throw new FabanClientException("Something went wrong while submitting the run for benchmark " +
-                                                benchmarkName + " at profile " + profile + " with configuration " +
-                                                configFile.getAbsolutePath(), e);
-            }
+            return submit(benchmarkName, profile, fin);
 
-        } else {
+        } catch (FileNotFoundException e) {
             throw new ConfigFileNotFoundException("Configuration file " +
                                                     configFile.getAbsolutePath() +
                                                   " could not be found.");
+        } catch (IOException e) {
+            throw new FabanClientException("Something went wrong while submitting the run for benchmark " +
+                    benchmarkName + " at profile " + profile);
         }
 
+    }
+
+    public <R extends RunId, T> T submit(String benchmarkName, String profile, InputStream configFile, Function<R, T> handler) throws FabanClientException, ConfigFileNotFoundException, BenchmarkNameNotFoundException {
+        return this.submit(benchmarkName, profile, configFile).handle(handler);
+    }
+
+    public <R extends RunId> void submit(String benchmarkName, String profile, InputStream configFile, Consumer<R> handler) throws FabanClientException, ConfigFileNotFoundException, BenchmarkNameNotFoundException {
+        this.submit(benchmarkName, profile, configFile).handle(handler);
     }
 
     /**

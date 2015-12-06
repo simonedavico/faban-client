@@ -50,7 +50,8 @@ public class PendingCommand extends Configurable implements Command<RunQueue> {
             CloseableHttpResponse resp = httpClient.execute(get);
             int status = resp.getStatusLine().getStatusCode();
 
-            if(status == HttpStatus.SC_NO_CONTENT) throw new EmptyHarnessResponseException("Harness returned empty response to pending request");
+            if(status == HttpStatus.SC_NO_CONTENT)
+                throw new EmptyHarnessResponseException("Harness returned empty response to pending request");
 
             HttpEntity ent = resp.getEntity();
             InputStream in = resp.getEntity().getContent();

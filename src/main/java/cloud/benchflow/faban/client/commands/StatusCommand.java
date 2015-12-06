@@ -29,8 +29,7 @@ import java.net.URISyntaxException;
  */
 public class StatusCommand extends Configurable<StatusConfig> implements Command<RunStatus> {
 
-
-    private static String STATUS_PATH = "/submit";
+    private static String STATUS_PATH = "/status";
 
     public RunStatus exec(FabanClientConfig fabanConfig) throws IOException, RunIdNotFoundException {
         return status(fabanConfig);

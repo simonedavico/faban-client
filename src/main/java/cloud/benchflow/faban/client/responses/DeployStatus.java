@@ -8,12 +8,14 @@ import org.apache.http.HttpStatus;
  *
  * @author Simone D'Avico <simonedavico@gmail.com>
  */
-//TODO: make all responses Jackson compliant for easy JSON serialization
 public class DeployStatus implements Response {
 
-    public enum Code { CONFLICT, NOT_ACCEPTABLE, CREATED };
+    public enum Code {
+        CONFLICT, NOT_ACCEPTABLE, CREATED
+    }
 
     private Code code;
+
 
     public DeployStatus(int statusCode) {
         switch(statusCode) {

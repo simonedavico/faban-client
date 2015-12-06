@@ -18,8 +18,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.client.ResponseHandler;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
  */
 public class SubmitCommand extends Configurable<SubmitConfig> implements Command<RunId> {
 
-    private static String SUBMIT_URL = "";
+    private static String SUBMIT_URL = "/submit";
 
     public RunId exec(FabanClientConfig fabanConfig) throws IOException, BenchmarkNameNotFoundException {
         return submit(fabanConfig);
@@ -41,7 +41,7 @@ public class SubmitCommand extends Configurable<SubmitConfig> implements Command
 
         String benchmarkName = config.getBenchmarkName();
         String profile = config.getProfile();
-        File configFile = config.getConfigFile();
+        InputStream configFile = config.getConfigFile();
 
         ResponseHandler<RunId> sh = resp -> new RunId(new BasicResponseHandler().handleEntity(resp.getEntity()));
 
