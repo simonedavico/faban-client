@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
  */
 public class SubmitCommand extends Configurable<SubmitConfig> implements Command<RunId> {
 
-    private static String SUBMIT_URL = "";
+    private static String SUBMIT_URL = "/submit";
 
     public RunId exec(FabanClientConfig fabanConfig) throws IOException, BenchmarkNameNotFoundException {
         return submit(fabanConfig);
