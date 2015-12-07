@@ -69,7 +69,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param <T> the arbitrary return type
      * @return an object of type {@code <T>}
      */
-    public <R extends DeployStatus, T> T deploy(File jarFile, Function<R, T> handler) throws FabanClientException, JarFileNotFoundException {
+    public <R extends DeployStatus, T> T deploy(File jarFile, Function<R, T> handler) throws JarFileNotFoundException, FabanClientException  {
         return this.deploy(jarFile).handle(handler);
     }
 
@@ -80,7 +80,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      * @param <R> the type of the handler input (has to extend {@link DeployStatus})
      * @throws FabanClientException
      */
-    public <R extends DeployStatus> void deploy(File jarFile, Consumer<R> handler) throws FabanClientException, JarFileNotFoundException {
+    public <R extends DeployStatus> void deploy(File jarFile, Consumer<R> handler) throws JarFileNotFoundException, FabanClientException  {
         this.deploy(jarFile).handle(handler);
     }
 
