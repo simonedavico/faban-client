@@ -11,14 +11,16 @@ public class DeployConfig implements Config {
 
     //private File jarFile;
     private InputStream jarFile;
+    private String driverName;
     private boolean clearConfig;
 
-    public DeployConfig(InputStream jarFile) {
-        this(jarFile, true);
+    public DeployConfig(InputStream jarFile, String driverName) {
+        this(jarFile, driverName, true);
     }
 
-    public DeployConfig(InputStream jarFile, boolean clearConfig) {
+    public DeployConfig(InputStream jarFile, String driverName, boolean clearConfig) {
         this.jarFile = jarFile;
+        this.driverName = driverName;
         this.clearConfig = clearConfig;
     }
 
@@ -30,5 +32,5 @@ public class DeployConfig implements Config {
         return clearConfig;
     }
 
-
+    public String getDriverName() { return driverName; }
 }

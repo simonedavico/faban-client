@@ -5,12 +5,15 @@ import cloud.benchflow.faban.client.configurations.FabanClientConfig;
 import cloud.benchflow.faban.client.responses.DeployStatus;
 import cloud.benchflow.faban.client.configurations.Configurable;
 import cloud.benchflow.faban.client.exceptions.MalformedURIException;
+import com.google.common.io.ByteStreams;
 import org.apache.http.HttpEntity;
 
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -52,11 +55,15 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
                                 .setPath(DEPLOY_URL)
                                 .build();
             HttpPost post = new HttpPost(deployURL);
+
+            byte[] boh = ByteStreams.toByteArray(jarFile);
+
             HttpEntity multipartEntity = MultipartEntityBuilder.create()
                                   .addTextBody("user", fabanConfig.getUser())
                                   .addTextBody("password", fabanConfig.getPassword())
                                   .addTextBody("clearconfig", clearConfig.toString())
-                                  .addBinaryBody("jarfile", jarFile)
+                                  .addBinaryBody("jarfile", ByteStreams.toByteArray(jarFile),
+                                                 ContentType.DEFAULT_BINARY, this.config.getDriverName())
                                   .build();
 
             post.setEntity(multipartEntity);

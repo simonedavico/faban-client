@@ -19,9 +19,9 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     private FabanClientConfig fabanConfig = new FabanClientDefaultConfig();
 
-    public DeployStatus deploy(InputStream jarFile) throws FabanClientException {
+    public DeployStatus deploy(InputStream jarFile, String driverName) throws FabanClientException {
 
-        DeployConfig config = new DeployConfig(jarFile);
+        DeployConfig config = new DeployConfig(jarFile, driverName);
         DeployCommand deploy = new DeployCommand().withConfig(config);
 
         try {
@@ -41,7 +41,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
         try(FileInputStream fin = new FileInputStream(jarFile)) {
 
-            return deploy(fin);
+            return deploy(fin, jarFile.getName());
 
         } catch (FileNotFoundException e) {
             throw new JarFileNotFoundException("The specified jar file ( " +
@@ -54,12 +54,12 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     }
 
-    public <R extends DeployStatus, T> T deploy(InputStream jarFile, Function<R, T> handler) throws FabanClientException {
-        return this.deploy(jarFile).handle(handler);
+    public <R extends DeployStatus, T> T deploy(InputStream jarFile, String driverName, Function<R, T> handler) throws FabanClientException {
+        return this.deploy(jarFile, driverName).handle(handler);
     }
 
-    public <R extends DeployStatus> void deploy(InputStream jarFile, Consumer<R> handler) throws FabanClientException {
-        this.deploy(jarFile).handle(handler);
+    public <R extends DeployStatus> void deploy(InputStream jarFile, String driverName, Consumer<R> handler) throws FabanClientException {
+        this.deploy(jarFile, driverName).handle(handler);
     }
 
     /**

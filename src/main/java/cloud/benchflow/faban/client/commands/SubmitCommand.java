@@ -7,11 +7,13 @@ import cloud.benchflow.faban.client.exceptions.EmptyHarnessResponseException;
 import cloud.benchflow.faban.client.configurations.Configurable;
 import cloud.benchflow.faban.client.exceptions.MalformedURIException;
 import cloud.benchflow.faban.client.responses.RunId;
+import com.google.common.io.ByteStreams;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -55,7 +57,8 @@ public class SubmitCommand extends Configurable<SubmitConfig> implements Command
             HttpEntity multipartEntity = MultipartEntityBuilder.create()
                                     .addTextBody("sun", fabanConfig.getUser())
                                     .addTextBody("sp", fabanConfig.getPassword())
-                                    .addBinaryBody("configfile", configFile)
+                                    .addBinaryBody("configfile", ByteStreams.toByteArray(configFile),
+                                                   ContentType.DEFAULT_BINARY, "run.xml")
                                     .build();
 
             post.setEntity(multipartEntity);
