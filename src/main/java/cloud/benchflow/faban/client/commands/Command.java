@@ -2,7 +2,7 @@ package cloud.benchflow.faban.client.commands;
 
 import cloud.benchflow.faban.client.configurations.FabanClientConfig;
 import cloud.benchflow.faban.client.responses.Response;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 
 /**
  * @author Simone D'Avico <simonedavico@gmail.com>
@@ -12,7 +12,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public interface Command<T extends Response> {
 
     default T exec(FabanClientConfig fabanConfig) throws Exception {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
 }
