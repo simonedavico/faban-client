@@ -1,10 +1,14 @@
 package cloud.benchflow.faban.test.client;
 
 import cloud.benchflow.faban.client.FabanClient;
+import cloud.benchflow.faban.client.configurations.FabanClientConfigImpl;
 import cloud.benchflow.faban.client.exceptions.JarFileNotFoundException;
 import cloud.benchflow.faban.client.responses.DeployStatus;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -16,11 +20,12 @@ import java.nio.file.Paths;
  */
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
 
         //get an instance of faban client
-        FabanClient client = new FabanClient();
+        FabanClient client = new FabanClient().withConfig(new FabanClientConfigImpl("deployer","adminadmin",new URI("http://195.176.181.55:9980")));
         Path bm = Paths.get("./src/test/resources/foofoofoo.jar");
+
         try {
             client.deploy(bm.toFile()).handle((DeployStatus s) -> System.out.println(s.getCode()));
         } catch (JarFileNotFoundException e) {

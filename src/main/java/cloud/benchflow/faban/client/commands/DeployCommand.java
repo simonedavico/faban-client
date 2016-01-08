@@ -13,7 +13,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -21,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 
 
 /**
@@ -56,14 +56,16 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
                                 .build();
             HttpPost post = new HttpPost(deployURL);
 
-            byte[] boh = ByteStreams.toByteArray(jarFile);
-
             HttpEntity multipartEntity = MultipartEntityBuilder.create()
                                   .addTextBody("user", fabanConfig.getUser())
                                   .addTextBody("password", fabanConfig.getPassword())
                                   .addTextBody("clearconfig", clearConfig.toString())
                                   .addBinaryBody("jarfile", ByteStreams.toByteArray(jarFile),
-                                                 ContentType.DEFAULT_BINARY, this.config.getDriverName())
+                                                 //ContentType.create("application/java-archive"),
+                                                 //ContentType.DEFAULT_BINARY,
+                                                ContentType.create("application/octet-stream"),
+                                                 //"gobenchmark.jar")
+                                                 this.config.getDriverName())
                                   .build();
 
             post.setEntity(multipartEntity);
