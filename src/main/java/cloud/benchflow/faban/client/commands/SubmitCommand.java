@@ -57,8 +57,11 @@ public class SubmitCommand extends Configurable<SubmitConfig> implements Command
             HttpEntity multipartEntity = MultipartEntityBuilder.create()
                                     .addTextBody("sun", fabanConfig.getUser())
                                     .addTextBody("sp", fabanConfig.getPassword())
-                                    .addBinaryBody("configfile", ByteStreams.toByteArray(configFile),
-                                                   ContentType.DEFAULT_BINARY, "run.xml")
+                                    .addBinaryBody("configfile",
+                                                   ByteStreams.toByteArray(configFile),
+                                                   //ContentType.DEFAULT_BINARY,
+                                                   ContentType.create("application/octet-stream"),
+                                                   "run.xml")
                                     .build();
 
             post.setEntity(multipartEntity);
