@@ -17,7 +17,7 @@ public class RunId implements Response {
     }
 
     public RunId(String runId) {
-        String[] parts = runId.split(".");
+        String[] parts = runId.split("\\.");
         if(parts.length != 2)
             throw new IllegalRunIdException("Received unexpected runId " + runId);
         this.name = parts[0];

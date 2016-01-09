@@ -50,7 +50,7 @@ public class SubmitCommand extends Configurable<SubmitConfig> implements Command
         try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
             URI submitURL = new URIBuilder(fabanConfig.getMasterURL())
-                                    .setPath(SUBMIT_URL)
+                                    .setPath(SUBMIT_URL + "/" + benchmarkName + "/" + profile)
                                     .build();
 
             HttpPost post = new HttpPost(submitURL);
