@@ -15,14 +15,19 @@ import java.util.function.Function;
  * The faban client implementation.
  */
 @SuppressWarnings("unused")
-public class FabanClient extends Configurable<FabanClientConfigImpl> {
+public class FabanClient extends Configurable<FabanClientConfig> {
 
-    private FabanClientConfig fabanConfig = new FabanClientDefaultConfig();
+    private FabanClientConfig defaultConfig = new FabanClientDefaultConfig();
+
+    private FabanClientConfig chooseConfig() {
+        return (config == null) ? defaultConfig : config;
+    }
 
     public DeployStatus deploy(InputStream jarFile, String driverName) throws FabanClientException {
 
-        DeployConfig config = new DeployConfig(jarFile, driverName);
-        DeployCommand deploy = new DeployCommand().withConfig(config);
+        DeployConfig deployConfig = new DeployConfig(jarFile, driverName);
+        DeployCommand deploy = new DeployCommand().withConfig(deployConfig);
+        FabanClientConfig fabanConfig = chooseConfig();
 
         try {
             return deploy.exec(fabanConfig);
@@ -92,8 +97,9 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      */
     public RunStatus status(RunId runId) throws FabanClientException, RunIdNotFoundException {
 
-        StatusConfig config = new StatusConfig(runId);
-        StatusCommand status = new StatusCommand().withConfig(config);
+        StatusConfig statusConfig = new StatusConfig(runId);
+        StatusCommand status = new StatusCommand().withConfig(statusConfig);
+        FabanClientConfig fabanConfig = chooseConfig();
 
         try {
             return status.exec(fabanConfig);
@@ -130,8 +136,9 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     public RunId submit(String benchmarkName, String profile, InputStream configFile) throws FabanClientException, BenchmarkNameNotFoundException {
 
-        SubmitConfig config = new SubmitConfig(benchmarkName, profile, configFile);
-        SubmitCommand submit = new SubmitCommand().withConfig(config);
+        SubmitConfig runConfig = new SubmitConfig(benchmarkName, profile, configFile);
+        SubmitCommand submit = new SubmitCommand().withConfig(runConfig);
+        FabanClientConfig fabanConfig = chooseConfig();
 
         try {
             return submit.exec(fabanConfig);
@@ -215,8 +222,9 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
      */
     public RunStatus kill(RunId runId) throws FabanClientException, RunIdNotFoundException {
 
-        StatusConfig config = new StatusConfig(runId);
-        KillCommand kill = new KillCommand().withConfig(config);
+        StatusConfig killConfig = new StatusConfig(runId);
+        KillCommand kill = new KillCommand().withConfig(killConfig);
+        FabanClientConfig fabanConfig = chooseConfig();
 
         try {
             return kill.exec(fabanConfig);
@@ -257,6 +265,7 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
     public RunQueue pending() throws FabanClientException {
 
         PendingCommand pending = new PendingCommand();
+        FabanClientConfig fabanConfig = chooseConfig();
 
         try {
             return pending.exec(fabanConfig);
@@ -288,8 +297,9 @@ public class FabanClient extends Configurable<FabanClientConfigImpl> {
 
     public RunLogStream showlogs(RunId runId) throws FabanClientException, RunIdNotFoundException {
 
-        ShowLogsConfig config = new ShowLogsConfig(runId);
-        ShowLogsCommand showlogs = new ShowLogsCommand().withConfig(config);
+        ShowLogsConfig logsConfig = new ShowLogsConfig(runId);
+        ShowLogsCommand showlogs = new ShowLogsCommand().withConfig(logsConfig);
+        FabanClientConfig fabanConfig = chooseConfig();
 
         try {
             return showlogs.exec(fabanConfig);

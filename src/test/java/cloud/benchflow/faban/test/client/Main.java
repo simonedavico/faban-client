@@ -1,14 +1,16 @@
 package cloud.benchflow.faban.test.client;
 
 import cloud.benchflow.faban.client.FabanClient;
+import cloud.benchflow.faban.client.configurations.FabanClientConfig;
 import cloud.benchflow.faban.client.configurations.FabanClientConfigImpl;
 import cloud.benchflow.faban.client.exceptions.JarFileNotFoundException;
+import cloud.benchflow.faban.client.exceptions.RunIdNotFoundException;
 import cloud.benchflow.faban.client.responses.DeployStatus;
+import cloud.benchflow.faban.client.responses.RunId;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -20,10 +22,11 @@ import java.nio.file.Paths;
  */
 public class Main {
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException, URISyntaxException, RunIdNotFoundException {
 
         //get an instance of faban client
-        FabanClient client = new FabanClient().withConfig(new FabanClientConfigImpl("deployer","adminadmin",new URI("http://195.176.181.55:9980")));
+        FabanClientConfig fcprova = new FabanClientConfigImpl("deployer","adminadmin",new URI("http://195.176.181.105:9980"));
+        FabanClient client = new FabanClient().withConfig(fcprova);
         Path bm = Paths.get("./src/test/resources/foofoofoo.jar");
 
         try {
@@ -31,6 +34,9 @@ public class Main {
         } catch (JarFileNotFoundException e) {
             e.printStackTrace();
         }
+        //FabanClientConfigImpl config = new FabanClientConfigImpl("","",new URI("http://195.176.181.55:9980/"));
+        //FabanClient fc = new FabanClient();//.withConfig(config);
+        //System.out.println(fc.status(new RunId("wfmsbenchmark.1Z")).getStatus());
 
         //assume we want to deploy...
 
