@@ -12,15 +12,24 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
+import org.apache.http.entity.mime.MIME;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.Arrays;
 
 
 /**
@@ -44,9 +53,12 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
 
     private DeployStatus deploy(FabanClientConfig fabanConfig) throws IOException {
 
-        ResponseHandler<DeployStatus> dh = resp -> new DeployStatus(resp.getStatusLine().getStatusCode());
+        ResponseHandler<DeployStatus> dh = resp -> {
+          System.out.println(resp);
+          return new DeployStatus(resp.getStatusLine().getStatusCode());
+        };
 
-        InputStream jarFile = this.config.getJarFile();
+        File jarFile = this.config.getJarFile();
         Boolean clearConfig = config.clearConfig();
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()){
@@ -56,17 +68,14 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
                                 .build();
             HttpPost post = new HttpPost(deployURL);
 
-            HttpEntity multipartEntity = MultipartEntityBuilder.create()
-                                  .addTextBody("user", fabanConfig.getUser())
-                                  .addTextBody("password", fabanConfig.getPassword())
-                                  .addTextBody("clearconfig", clearConfig.toString())
-                                  .addBinaryBody("jarfile", ByteStreams.toByteArray(jarFile),
-                                                 //ContentType.create("application/java-archive"),
-                                                 //ContentType.DEFAULT_BINARY,
-                                                ContentType.create("application/octet-stream"),
-                                                 //"gobenchmark.jar")
-                                                 this.config.getDriverName())
-                                  .build();
+            HttpEntity multipartEntity = MultipartEntityBuilder
+                    .create()
+                    .addTextBody("user", fabanConfig.getUser())
+                    .addTextBody("password", fabanConfig.getPassword())
+                    .addBinaryBody("jarfile", jarFile,
+                                    ContentType.create("application/java-archive"), config.getDriverName())
+                    .addTextBody("clearconfig", clearConfig.toString())
+                    .build();
 
             post.setEntity(multipartEntity);
             post.setHeader("Accept", "text/plain");

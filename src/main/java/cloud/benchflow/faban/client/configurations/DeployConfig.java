@@ -1,5 +1,6 @@
 package cloud.benchflow.faban.client.configurations;
 
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -9,22 +10,22 @@ import java.io.InputStream;
  */
 public class DeployConfig implements Config {
 
-    //private File jarFile;
-    private InputStream jarFile;
+    private File jarFile;
+//    private InputStream jarFile;
     private String driverName;
     private boolean clearConfig;
 
-    public DeployConfig(InputStream jarFile, String driverName) {
+    public DeployConfig(File jarFile, String driverName) {
         this(jarFile, driverName, true);
     }
 
-    public DeployConfig(InputStream jarFile, String driverName, boolean clearConfig) {
+    public DeployConfig(File jarFile, String driverName, boolean clearConfig) {
         this.jarFile = jarFile;
         this.driverName = driverName;
         this.clearConfig = clearConfig;
     }
 
-    public InputStream getJarFile() {
+    public File getJarFile() {
         return jarFile;
     }
 

@@ -23,30 +23,21 @@ public class FabanClient extends Configurable<FabanClientConfig> {
         return (config == null) ? defaultConfig : config;
     }
 
-    public DeployStatus deploy(InputStream jarFile, String driverName) throws FabanClientException {
-
-        DeployConfig deployConfig = new DeployConfig(jarFile, driverName);
-        DeployCommand deploy = new DeployCommand().withConfig(deployConfig);
-        FabanClientConfig fabanConfig = chooseConfig();
-
-        try {
-            return deploy.exec(fabanConfig);
-        } catch (IOException e) {
-            throw new FabanClientException("An unknow error occurred while processing the driver to deploy. " +
-                                           "Please try again.", e);
-        }
-
-    }
-
     /**
      * @param jarFile the benchmark to be deployed on the faban harness
      * @return a response enclosing the status of the operation
      */
     public DeployStatus deploy(File jarFile) throws FabanClientException, JarFileNotFoundException {
 
+        String benchmarkName = jarFile.getName();
+        DeployConfig deployConfig = new DeployConfig(jarFile, benchmarkName);
+        DeployCommand deploy = new DeployCommand().withConfig(deployConfig);
+        FabanClientConfig fabanConfig = chooseConfig();
+
         try(FileInputStream fin = new FileInputStream(jarFile)) {
 
-            return deploy(fin, jarFile.getName());
+            return deploy.exec(fabanConfig);
+            //return deploy(fin, jarFile.getName());
 
         } catch (FileNotFoundException e) {
             throw new JarFileNotFoundException("The specified jar file ( " +
@@ -59,12 +50,12 @@ public class FabanClient extends Configurable<FabanClientConfig> {
 
     }
 
-    public <R extends DeployStatus, T> T deploy(InputStream jarFile, String driverName, Function<R, T> handler) throws FabanClientException {
-        return this.deploy(jarFile, driverName).handle(handler);
+    public <R extends DeployStatus, T> T deploy(File jarFile, String driverName, Function<R, T> handler) throws FabanClientException, JarFileNotFoundException {
+        return this.deploy(jarFile).handle(handler);
     }
 
-    public <R extends DeployStatus> void deploy(InputStream jarFile, String driverName, Consumer<R> handler) throws FabanClientException {
-        this.deploy(jarFile, driverName).handle(handler);
+    public <R extends DeployStatus> void deploy(File jarFile, String driverName, Consumer<R> handler) throws FabanClientException, JarFileNotFoundException {
+        this.deploy(jarFile).handle(handler);
     }
 
     /**

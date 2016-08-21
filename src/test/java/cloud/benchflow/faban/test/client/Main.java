@@ -3,6 +3,7 @@ package cloud.benchflow.faban.test.client;
 import cloud.benchflow.faban.client.FabanClient;
 import cloud.benchflow.faban.client.configurations.FabanClientConfig;
 import cloud.benchflow.faban.client.configurations.FabanClientConfigImpl;
+import cloud.benchflow.faban.client.exceptions.ConfigFileNotFoundException;
 import cloud.benchflow.faban.client.exceptions.JarFileNotFoundException;
 import cloud.benchflow.faban.client.exceptions.RunIdNotFoundException;
 import cloud.benchflow.faban.client.responses.DeployStatus;
@@ -25,13 +26,15 @@ public class Main {
     public static void main(String[] args) throws IOException, URISyntaxException, RunIdNotFoundException {
 
         //get an instance of faban client
-        FabanClientConfig fcprova = new FabanClientConfigImpl("deployer","adminadmin",new URI("http://195.176.181.105:9980"));
+        FabanClientConfig fcprova = new FabanClientConfigImpl("deployer","adminadmin",new URI("http://localhost:9980"));
         FabanClient client = new FabanClient().withConfig(fcprova);
         Path bm = Paths.get("./src/test/resources/foofoofoo.jar");
+        Path configFile = Paths.get("./src/test/resources/");
 
         try {
             client.deploy(bm.toFile()).handle((DeployStatus s) -> System.out.println(s.getCode()));
-        } catch (JarFileNotFoundException e) {
+            client.submit("fooBenchmark", "fooBenchmark", Paths.get("").toFile());
+        } catch (JarFileNotFoundException | ConfigFileNotFoundException e) {
             e.printStackTrace();
         }
         //FabanClientConfigImpl config = new FabanClientConfigImpl("","",new URI("http://195.176.181.55:9980/"));
