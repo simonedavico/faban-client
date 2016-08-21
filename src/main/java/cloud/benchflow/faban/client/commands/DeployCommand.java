@@ -51,6 +51,15 @@ public class DeployCommand extends Configurable<DeployConfig> implements Command
         return deploy(fabanConfig);
     }
 
+
+    /*  Since deploying a stream to Faban suddenly doesn’t work anymore, we
+        changed the API to deploy a File (which works as expected).
+
+        A stream would have been better because it wouldn’t have required to
+        have a file on the file system, reducing the IO of the components using
+        the library.
+        Nevertheless, this solution is good enough until we figure out how to
+        send a stream of data to Faban. */
     private DeployStatus deploy(FabanClientConfig fabanConfig) throws IOException {
 
         ResponseHandler<DeployStatus> dh = resp -> {
